@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-row justify="center">
       <v-card class="mx-auto" width="800">
-        <v-card-title>Novo motorista</v-card-title>
+        <v-card-title>{{ form_title }}</v-card-title>
         <v-card-text>
           <v-form ref="form">
             <v-row>
@@ -172,6 +172,11 @@ export default {
         cnh_type: this.driver_data.cnh_type,
         cpf: this.driver_data.cpf
       };
+    },
+    form_title() {
+      return this.$route.name == "EditDriver"
+        ? "Atualizar motorista"
+        : "Novo motorista";
     }
   },
   directives: {
