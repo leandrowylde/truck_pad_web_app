@@ -50,7 +50,9 @@
                   >
                 </v-btn>
                 <v-btn icon small>
-                  <v-icon small>mdi-delete</v-icon>
+                  <v-icon small @click.prevent="deleteDriver(item)"
+                    >mdi-delete</v-icon
+                  >
                 </v-btn>
               </template>
             </v-data-table>
@@ -62,6 +64,7 @@
 </template>
 <script>
 import { mask } from "vue-the-mask";
+
 export default {
   directives: {
     mask
@@ -72,7 +75,7 @@ export default {
         {
           text: "Nome",
           align: "left",
-          sortable: false,
+          sortable: true,
           value: "name"
         },
         {
@@ -84,7 +87,7 @@ export default {
         {
           text: "Data de Nascimento",
           align: "left",
-          sortable: false,
+          sortable: true,
           value: "birthdate"
         },
         {
@@ -102,7 +105,7 @@ export default {
         {
           text: "Tipo CNH",
           align: "center",
-          sortable: false,
+          sortable: true,
           value: "cnh_type"
         },
         {
@@ -120,8 +123,10 @@ export default {
       this.$router.push("/drivers/new");
     },
     editDriver(driver) {
-      console.log("Driver to update => ", driver);
       this.$router.push(`/drivers/${driver._id}`);
+    },
+    deleteDriver(driver) {
+      this.$store.dispatch("removeDriver", driver._id);
     }
   },
   computed: {
