@@ -4,13 +4,33 @@
       <v-row justify="center">
         <v-card class="mx-auto">
           <v-card-title
-            >Motoristas
-            <v-spacer></v-spacer>
-            <v-btn color="amber" @click.prevent="newDriver()">Novo</v-btn>
+            ><v-col class="d-flex">
+              <span>Motoristas</span>
+            </v-col>
+
+            <v-col class="d-flex"
+              ><v-text-field
+                type="text"
+                v-model="search"
+                placeholder="Pesquisar"
+                outlined
+                class="mr-4"
+                single-line
+              ></v-text-field>
+              <v-btn color="amber" x-large @click.prevent="newDriver()"
+                >Novo</v-btn
+              >
+            </v-col>
           </v-card-title>
 
           <v-card-text>
-            <v-data-table :headers="headers" :items="drivers">
+            <v-data-table
+              :headers="headers"
+              :items="drivers"
+              no-data-text="Sem registros para exibir."
+              no-results-text="Nenhum registro encontrado."
+              :search="search"
+            >
               <template v-slot:item.phone="{ item }">
                 {{ item.phone | phone }}
               </template>
@@ -25,7 +45,9 @@
               </template>
               <template v-slot:item.actions="{ item }">
                 <v-btn icon small>
-                  <v-icon small>mdi-pencil</v-icon>
+                  <v-icon small @click.prevent="editDriver(item)"
+                    >mdi-pencil</v-icon
+                  >
                 </v-btn>
                 <v-btn icon small>
                   <v-icon small>mdi-delete</v-icon>
@@ -89,17 +111,22 @@ export default {
           sortable: false,
           value: "actions"
         }
-      ]
+      ],
+      search: ""
     };
   },
   methods: {
     newDriver() {
       this.$router.push("/drivers/new");
+    },
+    editDriver(driver) {
+      console.log("Driver to update => ", driver);
+      this.$router.push(`/drivers/${driver._id}`);
     }
   },
   computed: {
     drivers() {
-      return this.$store.state.drivers;
+      return this.$store.getters.drivers;
     }
   },
   filters: {
@@ -129,6 +156,9 @@ export default {
         9
       )}-${cpf.slice(9)}`;
     }
+  },
+  mounted() {
+    this.$store.dispatch("fetchDrivers");
   }
 };
 </script>
