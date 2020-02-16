@@ -1,29 +1,27 @@
 # truck_pad_web_web
 
-## Project setup
+## Descrição
+
+Web App criado em Vue.JS para teste da empresa Truck Pad. App possui Vue Router para manipulação das rotas da SPA e Vuex para manutenção de estado da aplicação.
+
+NeDB utilizado como persistência temporária no browser.
+
+## Instalação das dependências
+
 ```
 yarn install
 ```
 
-### Compiles and hot-reloads for development
+```
+npm run install
+```
+
+### Run App
+
 ```
 yarn run serve
 ```
 
-### Compiles and minifies for production
 ```
-yarn run build
+npm run serve
 ```
-
-### Run your tests
-```
-yarn run test
-```
-
-### Lints and fixes files
-```
-yarn run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
