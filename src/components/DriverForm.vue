@@ -4,14 +4,16 @@
       <v-card class="mx-auto" width="800">
         <v-card-title>Novo motorista</v-card-title>
         <v-card-text>
-          <v-form>
+          <v-form ref="form">
             <v-row>
               <v-col cols="12" md="12">
                 <v-text-field
                   label="Nome"
                   color="amber"
                   outlined
+                  ref="name"
                   v-model="driver_data.name"
+                  :rules="[validation_rules.required]"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -22,8 +24,10 @@
                   label="Telefone"
                   color="amber"
                   outlined
+                  ref="phone"
                   v-model.lazy="driver_data.phone"
                   v-mask="['(##) ####-####', '(##) #####-####']"
+                  :rules="[validation_rules.required, validation_rules.phone]"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
@@ -31,8 +35,10 @@
                   label="Data de nascimento"
                   color="amber"
                   outlined
+                  ref="birthdate"
                   v-model.lazy="driver_data.birthdate"
                   v-mask="'##/##/####'"
+                  :rules="[validation_rules.required, validation_rules.date]"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -43,7 +49,9 @@
                   label="Registro CNH"
                   color="amber"
                   outlined
+                  ref="cnh"
                   v-model="driver_data.cnh"
+                  :rules="[validation_rules.required]"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" md="4">
@@ -52,7 +60,9 @@
                   label="Tipo de CNH"
                   color="amber"
                   outlined
+                  ref="cnh_type"
                   v-model="driver_data.cnh_type"
+                  :rules="[validation_rules.required]"
                 ></v-select>
               </v-col>
               <v-col cols="12" md="4">
@@ -60,8 +70,10 @@
                   label="CPF"
                   color="amber"
                   outlined
+                  ref="cpf"
                   v-model.lazy="driver_data.cpf"
                   v-mask="'###.###.###-##'"
+                  :rules="[validation_rules.required, validation_rules.cpf]"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -82,7 +94,14 @@
 <script>
 import { mask } from "vue-the-mask";
 import moment from "moment";
-import { formatToPhone, formatToDate, formatToCPF } from "brazilian-values";
+import {
+  formatToPhone,
+  formatToDate,
+  formatToCPF,
+  isDate,
+  isCPF,
+  isPhone
+} from "brazilian-values";
 
 export default {
   data() {
@@ -96,18 +115,34 @@ export default {
         cnh: "",
         cnh_type: "",
         cpf: ""
+      },
+      validation_rules: {
+        required: value => !!value || "Campo obrigatório.",
+        date: value => !!isDate(value) || "Data inválida.",
+        cpf: value => !!isCPF(value) || "CPF inválido.",
+        phone: value => !!isPhone(value) || "Telefone inválido"
       }
     };
   },
   methods: {
     saveDriver() {
+      this.formErrors = false;
+      Object.keys(this.form).forEach(field => {
+        if (!this.form[field]) this.formErrors = true;
+        this.$refs[field].validate(true);
+      });
+
+      if (this.formErrors) {
+        return;
+      }
       let payload = {
         name: this.driver_data.name,
         phone: this.driver_data.phone.replace(/[() -]/g, ""),
         birthdate: this.parseBirthdate(this.driver_data.birthdate),
         cnh: this.driver_data.cnh,
         cnh_type: this.driver_data.cnh_type,
-        cpf: this.driver_data.cpf.replace(/[.-]/g, "")
+        cpf: this.driver_data.cpf.replace(/[.-]/g, ""),
+        active: true
       };
       console.log("Save driver route", this.$route.name);
       if (this.$route.name === "EditDriver") {
@@ -128,8 +163,15 @@ export default {
     }
   },
   computed: {
-    snackbar_notification() {
-      return this.$store.getters.snackbar_notification;
+    form() {
+      return {
+        name: this.driver_data.name,
+        phone: this.driver_data.phone,
+        birthdate: this.driver_data.birthdate,
+        cnh: this.driver_data.cnh,
+        cnh_type: this.driver_data.cnh_type,
+        cpf: this.driver_data.cpf
+      };
     }
   },
   directives: {
