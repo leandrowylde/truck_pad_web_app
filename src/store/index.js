@@ -24,15 +24,9 @@ export default new Vuex.Store({
     SET_DRIVERS(state, data) {
       state.drivers = data;
     },
-    SET_DRIVER_TO_EDIT(state, data) {
-      console.log("Drivers on Edit => ", state.drivers);
-      state.driver_to_edit = data;
-    },
-    SET_ERROR(state, msg) {
-      state.error = msg;
-    },
-    CLEAN_ERROR(state) {
-      state.error = null;
+    UPDATE_DRIVERS_LIST(state, data) {
+      let index = state.drivers.findIndex(driver => driver._id == data);
+      state.drivers[index].active = false;
     }
   },
   actions: {
@@ -44,7 +38,8 @@ export default new Vuex.Store({
           birthdate: "1990-05-05",
           cnh: "17093134349",
           cnh_type: "E",
-          cpf: "54460800098"
+          cpf: "54460800098",
+          active: true
         },
         {
           name: "Motorista 2",
@@ -52,7 +47,8 @@ export default new Vuex.Store({
           birthdate: "1982-07-10",
           cnh: "99905416968",
           cnh_type: "E",
-          cpf: "16386856066"
+          cpf: "16386856066",
+          active: true
         },
         {
           name: "Motorista 3",
@@ -60,7 +56,8 @@ export default new Vuex.Store({
           birthdate: "1980-04-03",
           cnh: "58150274840",
           cnh_type: "E",
-          cpf: "67022186057"
+          cpf: "67022186057",
+          active: true
         }
       ];
       db.insert(drivers, (err, data) => {
@@ -117,15 +114,36 @@ export default new Vuex.Store({
             commit("SET_ERROR_MESSAGE", `Erro ao salvar o registro.`);
             reject(err);
           }
+          // commit("UPDATE_NEW_DRIVER_TO_LIST", data);
           commit("SET_SUCCESS_MESSAGE", "Registro inserido.");
           resolve(data);
         });
+      });
+    },
+    removeDriver({ commit }, payload) {
+      commit("CLEAN_MESSAGES");
+      return new Promise((resolve, reject) => {
+        db.update(
+          { _id: payload },
+          { $set: { active: false } },
+          {},
+          (err, data) => {
+            if (err !== null) {
+              commit("SET_ERROR_MESSAGE", "Erro ao remover registro.");
+            }
+            commit("UPDATE_DRIVERS_LIST", payload);
+            commit(
+              "SET_SUCCESS_MESSAGE",
+              `Registro de ID ${payload} inativado.`
+            );
+          }
+        );
       });
     }
   },
   getters: {
     drivers: state => {
-      return state.drivers;
+      return state.drivers.filter(driver => driver.active);
     },
     successMessage: state => {
       return state.successMessage;
