@@ -14,7 +14,7 @@
 
       <v-col class="mb-4">
         <h1 class="display-2 font-weight-bold mb-3">
-          TruckPad - O app da carga
+          O app da carga
         </h1>
       </v-col>
       <!-- <v-col class="mb-5" cols="12">
